@@ -1,0 +1,15 @@
+release/GamieHentaiParser.o
+release/css_lex.o
+release/css_syntax.o
+release/parser.o
+release/parser_pp.o
+release/CharsetConverter.o
+release/Extensions.o
+release/Node.o
+release/ParserDom.o
+release/ParserSax.o
+release/Uri.o
+release/utils.o
+release/main.o
+release/GamiMainWidget.o
+release/moc_GamiMainWidget.o

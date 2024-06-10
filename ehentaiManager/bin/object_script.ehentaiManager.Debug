@@ -1,0 +1,15 @@
+debug/GamieHentaiParser.o
+debug/css_lex.o
+debug/css_syntax.o
+debug/parser.o
+debug/parser_pp.o
+debug/CharsetConverter.o
+debug/Extensions.o
+debug/Node.o
+debug/ParserDom.o
+debug/ParserSax.o
+debug/Uri.o
+debug/utils.o
+debug/main.o
+debug/GamiMainWidget.o
+debug/moc_GamiMainWidget.o
