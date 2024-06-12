@@ -1,5 +1,5 @@
-QT       += core gui network
-
+QT       += gui widgets
+QT       += core network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11 console
@@ -38,8 +38,7 @@ HEADERS += \
     GamieHentaiObject.h \
     GamieHentaiParser.h
 
-FORMS += \
-    GamieHentaiObject.ui
+FORMS +=
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -4,6 +4,8 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QNetworkAccessManager>
+#include <QNetworkCookie>
+#include <QNetworkCookieJar>
 #include <QNetworkProxy>
 #include <QDebug>
 #include <QImage>
@@ -25,9 +27,17 @@ GamieHentaiObject::~GamieHentaiObject(){
     delete _net_manager;
 }
 void GamieHentaiObject::request(QString url){
+    QList<QNetworkCookie> cookies;
+    cookies.append(QNetworkCookie("nw","1"));
+
+    static QNetworkCookieJar cookieJar;
+    cookieJar.setCookiesFromUrl(cookies, url);
+    _net_manager->setCookieJar(&cookieJar);
+
     QNetworkRequest request;
     request.setUrl(QUrl(url)/*QUrl("https://e-hentai.org/g/2947169/980c019daf/")*/);
     _net_manager->get(request);
+
 }
 
 void GamieHentaiObject::OnFinished(QNetworkReply *reply){
@@ -50,17 +60,19 @@ void GamieHentaiObject::Controller()
     for(auto item: _ehentai_main_index_list)
         qDebug() <<item.index << item.title ;
 
-    printf("\n");
     int index = -1;
-    printf("input index and use key of enter load -> ");
+    printf("# ");
     bool scanf_ret = true;
+    fflush(stdout);
+    fflush(stdin);
     while( (scanf_ret = !scanf("%d", &index)) || (index < 1 || index > _ehentai_main_index_list.size())){
         fflush(stdout);
         fflush(stdin);
         if(scanf_ret || (index < 1 || index >= _ehentai_main_index_list.size()))
-            printf("input index and use key of enter load -> ");
+            printf("# ");
     }
     QString url = GamieHentaiParser::ToNormalURL(_ehentai_main_index_list.at(index-1).herf);
+    qDebug() << url;
     GamieHentaiImageManager *im = new GamieHentaiImageManager;
     im->request(url);
 #endif

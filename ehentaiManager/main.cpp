@@ -1,5 +1,6 @@
 
 #include "GamieHentaiObject.h"
+#include "GamieHentaiImageManager.h"
 #include "GamiGlobalSettings.h"
 #include <QApplication>
 
@@ -12,6 +13,7 @@ GamieHentaiObject *GetObjectInstance(){
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
     GamiGlobalSettings::global().setSocks5Proxy("10.255.169.18", 65533);
     GetObjectInstance()->request(QString("https://e-hentai.org/"));
 

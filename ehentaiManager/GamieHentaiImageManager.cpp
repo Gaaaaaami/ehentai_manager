@@ -4,14 +4,14 @@
 GamieHentaiImageManager::GamieHentaiImageManager(){}
 GamieHentaiImageManager::~GamieHentaiImageManager(){}
 void GamieHentaiImageManager::OnResponse(QByteArray &msg){
+
     GamieHentaiParser parser(msg);
     if(_page_index_and_href.size() == 0){
        _page_index_and_href = parser.GetImageList_PageHref();
        _image_src_href.append(parser.GetImageList());
 
+
         qDebug() << "page size -> "<< _page_index_and_href.size();
-
-
         GamieHentaiImageHrefManager *m = new GamieHentaiImageHrefManager;
         m->setPageIndexandHref(_page_index_and_href);
         m->request(_page_index_and_href.begin()->herf);
