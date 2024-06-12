@@ -1,15 +1,20 @@
 
-#include "GamiMainWidget.h"
+#include "GamieHentaiObject.h"
+#include "GamiGlobalSettings.h"
 #include <QApplication>
+
+
+GamieHentaiObject *GetObjectInstance(){
+    static GamieHentaiObject w;
+    return &w;
+}
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    GamiGlobalSettings::global().setSocks5Proxy("10.255.169.18", 65533);
+    GetObjectInstance()->request(QString("https://e-hentai.org/"));
 
-
-
-    GamiMainWidget w;
-    w.show();
     return a.exec();
 }
 

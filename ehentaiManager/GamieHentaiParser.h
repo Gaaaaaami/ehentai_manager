@@ -22,7 +22,7 @@ public:
     QVector<steHentaiItemInfo>                                   GetImageList_PageHref();
     QVector<steHentaiItemInfo>                                   GetPageIndexToArray();
 public:
-    QString                                                      ToNormalURL(QString addr);
+    static QString                                                      ToNormalURL(QString addr);
 protected:
     QString                    GetTag(QString tag);
     QString                    GetTag(QString tag, QString classname);
@@ -34,7 +34,7 @@ private:
     QStringList                GetAlltdTagInfo();
 private:
     QString                    GetTagName(QString tag);
-    QString                    GetTagEnd(QString tag, int start = 0);
+    QString                    GetTagEnd(QString tag, int start = -1);
     QString                    GetEnd(int start);
     QString                    GetClass(QString classname);
 private:

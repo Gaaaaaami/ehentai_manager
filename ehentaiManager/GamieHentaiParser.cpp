@@ -146,7 +146,18 @@ QString GamieHentaiParser::GetTagName(QString tag){
 QString GamieHentaiParser::GetTagEnd(QString tag, int start ){
     QString n = "</" + GetTagName(tag) + ">";
     int index = _msg.indexOf(tag);
+
+
     int end_index = _msg.indexOf(n, index);
+    if(start != -1){
+        index =start;
+        end_index = _msg.indexOf(n, start);
+
+
+
+    }
+
+
     if(index > -1 && end_index > -1){
         QString msg = _msg;
         msg.remove(end_index+n.size(),msg.length()-end_index-n.size());
@@ -204,6 +215,24 @@ QVector<GamieHentaiParser::steHentaiItemInfo> GamieHentaiParser::GetMainPageInde
 
 QVector<GamieHentaiParser::steHentaiItemInfo> GamieHentaiParser::GetImageList(){
     QVector<GamieHentaiParser::steHentaiItemInfo> final;
+    const char *search_obj = "<div class=\"gdtm\"";
+    int index = 0;
+    while(index > -1){
+
+        index = _msg.indexOf(search_obj, index);
+        if(index < 0)
+           break;
+        QString content = GetTagEnd(GetEnd(index),index);
+        GamieHentaiParser parser(content);
+        auto list = parser.GetAllTag("a");
+
+        for(auto item : list){
+            GamieHentaiParser::steHentaiItemInfo info;
+            info.herf = ToNormalURL( GetAttribute(item,"href"));
+            final.push_back(info);
+        }
+        index += strlen(search_obj);
+    }
     return final;
 }
 QVector<GamieHentaiParser::steHentaiItemInfo> GamieHentaiParser::GetImageList_PageHref(){
@@ -261,7 +290,7 @@ QVector<GamieHentaiParser::steHentaiItemInfo> GamieHentaiParser::GetPageIndexToA
 }
 
 QString GamieHentaiParser::ToNormalURL(QString addr){
-    addr.remove( addr.length()-2,2);
+    addr.remove( addr.length()-1,1);
     addr.remove( 0,1);
     return addr;
 }
