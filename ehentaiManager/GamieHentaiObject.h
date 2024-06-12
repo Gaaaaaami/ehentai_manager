@@ -1,5 +1,5 @@
 #pragma once
-#include <QWidget>
+#include <QObject>
 #include "GamiGlobalSettings.h"
 #include "GamieHentaiParser.h"
 QT_BEGIN_NAMESPACE

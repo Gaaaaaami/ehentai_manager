@@ -8,8 +8,6 @@
 #include <QNetworkCookieJar>
 #include <QNetworkProxy>
 #include <QDebug>
-#include <QImage>
-#include <QPainter>
 #include <QDateTime>
 GamieHentaiObject::GamieHentaiObject(QObject *parent)
     : QObject(parent),
