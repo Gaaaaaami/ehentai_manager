@@ -1,5 +1,5 @@
-QT       -= gui widgets
-QT       += core network
+
+QT       += core network widgets gui
 #greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11 console
@@ -26,14 +26,14 @@ LIBS+=-L$$PWD/lib -llibssl -llibcrypto -lcapi -ldasync -llibapps -lopenssl -loss
 
 }
 SOURCES += \
-    GamiGlobalSettings.cpp \
+    GamieHentaiGlobalSettings.cpp \
     GamieHentaiImageManager.cpp \
     GamieHentaiObject.cpp \
     GamieHentaiParser.cpp \
     main.cpp
 
 HEADERS += \
-    GamiGlobalSettings.h \
+    GamieHentaiGlobalSettings.h \
     GamieHentaiImageManager.h \
     GamieHentaiObject.h \
     GamieHentaiParser.h

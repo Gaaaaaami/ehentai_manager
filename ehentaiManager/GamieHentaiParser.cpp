@@ -22,6 +22,22 @@ QString GamieHentaiParser::GetTag(QString tag, QString classname){
     return GetTagEnd(t);
 }
 
+QString GamieHentaiParser::GetTagById(QString tag, QString id){
+    auto lst = GetAllTag(tag);
+    QString         t = "";
+    for(auto item : lst)
+    {
+        QString tag_id = GetID(item);
+        tag_id = ToNormalURL(tag_id);
+        if(id == tag_id){
+           t = item;
+        }
+    }
+    if(t.size() == 0)
+        return "";
+    return GetTagEnd(t);
+}
+
 QString GamieHentaiParser::GetContent(QString tag){
     QString final = "";
     int index = _msg.indexOf(tag);
@@ -65,6 +81,8 @@ QString GamieHentaiParser::GetTag(QString tag)
     auto lst = GetAllTag(tag);
     if(lst.size() == 0)
         return "";
+    if(tag == "img")
+        return lst.at(0);
     return GetTagEnd(lst.at(0));
 }
 QStringList GamieHentaiParser::GetAllTag(QString tag){
@@ -180,6 +198,9 @@ QString GamieHentaiParser::GetEnd(int start){
 QString GamieHentaiParser::GetClass(QString obj){
     return GetAttribute(obj, "class");
 }
+QString GamieHentaiParser::GetID(QString obj){
+    return GetAttribute(obj, "id");
+}
 QVector<GamieHentaiParser::steHentaiItemInfo> GamieHentaiParser::GetMainPageIndexList(){
     QVector<GamieHentaiParser::steHentaiItemInfo> final;
     GamieHentaiParser parser(GetTag("table" ,"\"itg gltc\""));
@@ -286,6 +307,21 @@ QVector<GamieHentaiParser::steHentaiItemInfo> GamieHentaiParser::GetPageIndexToA
         }
         ind++;
     }
+    return final;
+}
+
+QString GamieHentaiParser::GetImageDownloadHref(){
+    QString final = "";
+    QString content = GetTagById("div", "i3");
+    GamieHentaiParser parser(content);
+    content = parser.GetTag("img");
+    QString src = parser.GetAttribute(content, "src");
+    final = ToNormalURL( src);
+
+
+
+
+
     return final;
 }
 

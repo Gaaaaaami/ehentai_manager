@@ -22,10 +22,15 @@ public:
     QVector<steHentaiItemInfo>                                   GetImageList_PageHref();
     QVector<steHentaiItemInfo>                                   GetPageIndexToArray();
 public:
+    QString                                                      GetImageDownloadHref();
+
+public:
     static QString                                                      ToNormalURL(QString addr);
 protected:
     QString                    GetTag(QString tag);
     QString                    GetTag(QString tag, QString classname);
+    QString                    GetTagById(QString tag, QString id);
+
     QString                    GetContent(QString tag);
     QString                    GetAttribute(QString tag, QString attname);
 private:
@@ -36,7 +41,9 @@ private:
     QString                    GetTagName(QString tag);
     QString                    GetTagEnd(QString tag, int start = -1);
     QString                    GetEnd(int start);
-    QString                    GetClass(QString classname);
+    QString                    GetClass(QString obj);
+    QString                    GetID(QString obj);
+
 private:
     QString                    _msg;
 };

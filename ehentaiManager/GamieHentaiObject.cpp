@@ -1,7 +1,6 @@
 #include "GamieHentaiObject.h"
 #include "GamieHentaiImageManager.h"
-#include "ui_GamiMainWidget.h"
-#include <QNetworkReply>
+#include <QCoreApplication>
 #include <QNetworkRequest>
 #include <QNetworkAccessManager>
 #include <QNetworkCookie>
@@ -9,51 +8,93 @@
 #include <QNetworkProxy>
 #include <QDebug>
 #include <QDateTime>
+#include <QDir>
 GamieHentaiObject::GamieHentaiObject(QObject *parent)
-    : QObject(parent),
+    : QObject(parent),_retry_count(0),_progress(0.0),
     _net_manager(new QNetworkAccessManager(this)){
-    //qDebug()<<QSslSocket::sslLibraryBuildVersionString();
-    //qDebug() << "OpenSSL支持情况:" << QSslSocket::supportsSsl();//若输出：OpenSSL支持情况: false，那说明当前 Qt 不支持 OpenSSL
-    //for(auto supported : _net_manager->supportedSchemes())
-    //    qDebug() << supported;
-    _net_manager->setProxy(GamiGlobalSettings::global().getProxy());
+    if(GamieHentaiGlobalSettings::global().useProxy())
+        _net_manager->setProxy(GamieHentaiGlobalSettings::global().getProxy());
     connect(_net_manager, &QNetworkAccessManager::finished, this, &GamieHentaiObject::OnFinished);
+
+    _net_cookie = new QNetworkCookieJar;
+    _net_manager->setCookieJar(_net_cookie);
 }
 GamieHentaiObject::~GamieHentaiObject(){
     _net_manager->clearAccessCache();
     _net_manager->clearConnectionCache();
+
     delete _net_manager;
 }
-void GamieHentaiObject::request(QString url){
-    QList<QNetworkCookie> cookies;
-    cookies.append(QNetworkCookie("nw","1"));
 
-    static QNetworkCookieJar cookieJar;
-    cookieJar.setCookiesFromUrl(cookies, url);
-    _net_manager->setCookieJar(&cookieJar);
+void GamieHentaiObject::setSaveTo(QString path){
+    _save_to = path;
+}
+void GamieHentaiObject::request(QString url){
+    _request_url = url;
+
+
+    QList<QNetworkCookie> cookies;
+    cookies.append(QNetworkCookie("nw",  "1"));
+    _net_cookie->setCookiesFromUrl(cookies, url);
 
     QNetworkRequest request;
-    request.setUrl(QUrl(url)/*QUrl("https://e-hentai.org/g/2947169/980c019daf/")*/);
-    _net_manager->get(request);
+    request.setUrl(QUrl(url));
+    QNetworkReply *rep = _net_manager->get(request);
+    connect(rep, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(OnError(QNetworkReply::NetworkError)));
+    connect(rep, SIGNAL(downloadProgress(qint64 , qint64 )), this, SLOT(OnProgressChange(qint64 , qint64 )));
+    OnRequest();
+}
+double GamieHentaiObject::getProgress(){
+    return _progress;
+}
 
+qint64 GamieHentaiObject::getCurrent(){
+    return _current;
+}
+qint64 GamieHentaiObject::getTotal(){
+    return _total;
+}
+
+QString GamieHentaiObject::getRequestUrl()
+{
+    return _request_url;
 }
 
 void GamieHentaiObject::OnFinished(QNetworkReply *reply){
     if (reply->error() == QNetworkReply::NoError) {
             QByteArray response = reply->readAll();
             OnResponse(response);
-        } else {
-            qDebug() << "Error:" << reply->errorString();
-        }
+    }
+    reply->deleteLater();
 }
 void GamieHentaiObject::OnResponse(QByteArray &msg){
     GamieHentaiParser parser(msg);
    _ehentai_main_index_list = parser.GetMainPageIndexList();
-    Controller();
+   Controller();
+}
+void GamieHentaiObject::OnError(QNetworkReply::NetworkError err){
+    //超时重连机制
+    if(err != QNetworkReply::NoError){
+        _retry_count++;
+        OnRetry(_retry_count);
+    }
 }
 
-void GamieHentaiObject::Controller()
-{
+void GamieHentaiObject::OnRetry(int count){
+    QNetworkRequest request;
+    request.setUrl(QUrl(_request_url));
+    QNetworkReply *rep = _net_manager->get(request);
+    qDebug() << __FUNCTION__ << _request_url;
+    connect(rep, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(OnError(QNetworkReply::NetworkError)));
+}
+
+void GamieHentaiObject::OnRequest(){}
+void GamieHentaiObject::OnProgressChange(qint64 current, qint64 total){
+    _current = current;
+    _total = total;
+    _progress = double(current) / double(total);
+}
+void GamieHentaiObject::Controller(){
 #ifdef USE_CONSOLE_CONTROLLER
     for(auto item: _ehentai_main_index_list)
         qDebug() <<item.index << item.title ;
@@ -70,11 +111,19 @@ void GamieHentaiObject::Controller()
             printf("# ");
     }
     QString url = GamieHentaiParser::ToNormalURL(_ehentai_main_index_list.at(index-1).herf);
-    qDebug() << url;
-    GamieHentaiImageManager *im = new GamieHentaiImageManager;
+
+    QString utf8_name = _ehentai_main_index_list.at(index-1).title.toUtf8();
+    QString save = QCoreApplication::applicationDirPath()+"/"+utf8_name;
+
+    QDir dir;
+    if(!dir.exists(save))
+        qDebug() << (dir.mkdir(save) ? "create dir success!" : "create dir error!");
+    qDebug() << "save to->" << save;
+    qDebug() << "request url->" << url;
+
+    GamieHentaiImagePageIndexManager *im = new GamieHentaiImagePageIndexManager;
+    im->setSaveTo(save);
     im->request(url);
 #endif
-
-
 }
 
