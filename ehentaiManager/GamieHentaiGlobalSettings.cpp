@@ -69,7 +69,20 @@ void GamieHentaiGlobalSettings::addImageManager(QString dir, GamieHentaiImageMan
         f.clear();
         it = _image_manager.insert(dir , f);
     }
+
     auto &vector = it.value();
+
+    QVector<int > rel;
+    int index = 0;
+    for(auto *item : vector){
+        if(item->getRequestUrl() == p->getRequestUrl()){
+           rel.push_back(index);
+        }
+        index++;
+    }
+    for(auto ind : rel)
+        vector.removeAt(ind);
+
     vector.push_back(p);
 }
 void GamieHentaiGlobalSettings::delImageManager(QString dir, GamieHentaiImageManager *p)
