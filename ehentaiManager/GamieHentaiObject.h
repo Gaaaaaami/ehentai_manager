@@ -22,6 +22,8 @@ public:
 public:
      void setSaveTo(QString path);
      void request(QString url);
+     void request(QString url,unsigned int already_download_byte);
+     void printHex(char *data, unsigned int le);
 public:
      double             getProgress();
      qint64             getCurrent();
@@ -34,6 +36,7 @@ protected slots:
      virtual void OnRetry(int count);
      virtual void OnRequest();
      virtual void OnProgressChange(qint64 current, qint64 total);
+     virtual void OnNewData();
 protected:
      virtual void Controller();
 protected:
@@ -41,6 +44,7 @@ protected:
     QString                          _request_url;
     QNetworkAccessManager           *_net_manager;
     QNetworkCookieJar               *_net_cookie;
+    QNetworkReply                   *_net_reply;
 protected:
     unsigned int                     _retry_count;
 private:

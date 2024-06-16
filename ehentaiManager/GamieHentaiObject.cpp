@@ -10,7 +10,7 @@
 #include <QDateTime>
 #include <QDir>
 GamieHentaiObject::GamieHentaiObject(QObject *parent)
-    : QObject(parent),_retry_count(0),_progress(0.0),
+    : QObject(parent),_retry_count(0),_progress(0.0),_net_reply(nullptr),
     _net_manager(new QNetworkAccessManager(this)){
     if(GamieHentaiGlobalSettings::global().useProxy())
         _net_manager->setProxy(GamieHentaiGlobalSettings::global().getProxy());
@@ -31,7 +31,7 @@ void GamieHentaiObject::setSaveTo(QString path){
 }
 void GamieHentaiObject::request(QString url){
     _request_url = url;
-
+    qDebug() <<  __FUNCTION__<< url;
     OnRequest();
 
     QList<QNetworkCookie> cookies;
@@ -39,10 +39,39 @@ void GamieHentaiObject::request(QString url){
     _net_cookie->setCookiesFromUrl(cookies, url);
 
     QNetworkRequest request;
+    request.setRawHeader("Connection", "keep-alive");
     request.setUrl(QUrl(url));
     QNetworkReply *rep = _net_manager->get(request);
+    _net_reply = rep;
     connect(rep, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(OnError(QNetworkReply::NetworkError)));
     connect(rep, SIGNAL(downloadProgress(qint64 , qint64 )), this, SLOT(OnProgressChange(qint64 , qint64 )));
+
+}
+
+void GamieHentaiObject::request(QString url, unsigned int already_download_byte){
+    _request_url = url;
+    qDebug() <<  __FUNCTION__<< url << ", already download byte->" << already_download_byte;
+    OnRequest();
+
+    QList<QNetworkCookie> cookies;
+    cookies.append(QNetworkCookie("nw",  "1"));
+    _net_cookie->setCookiesFromUrl(cookies, url);
+    QString rangeHeader = QString("bytes=%1-").arg(QString::number(already_download_byte));
+    QNetworkRequest request;
+    request.setRawHeader("Range", rangeHeader.toUtf8());
+    request.setUrl(QUrl(url));
+    QNetworkReply *rep = _net_manager->get(request);
+    _net_reply = rep;
+    connect(rep, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(OnError(QNetworkReply::NetworkError)));
+    connect(rep, SIGNAL(readyRead()), this, SLOT(OnNewData()));
+}
+void GamieHentaiObject::printHex(char *data, unsigned int le){
+    for(int i = 0; i< le;i++){
+        int d = data[i];
+        printf("0x%02x, ", d & 0xff);
+        if(((i+1) % 5) == 0)
+            printf("\n");
+    }
 }
 double GamieHentaiObject::getProgress(){
     return _progress;
@@ -75,6 +104,8 @@ void GamieHentaiObject::OnResponse(QByteArray &msg){
 void GamieHentaiObject::OnError(QNetworkReply::NetworkError err){
     //超时重连机制
     if(err != QNetworkReply::NoError){
+
+        qDebug() << __FUNCTION__ << err;
         _retry_count++;
         OnRetry(_retry_count);
     }
@@ -93,6 +124,13 @@ void GamieHentaiObject::OnProgressChange(qint64 current, qint64 total){
     _current = current;
     _total = total;
     _progress = double(current) / double(total);
+}
+
+void GamieHentaiObject::OnNewData(){
+    auto data = _net_reply->readAll();
+    //printHex(data.data(), data.length());
+    qDebug() << (data.length()/1024) << "kb";
+
 }
 void GamieHentaiObject::Controller(){
 #ifdef USE_CONSOLE_CONTROLLER
@@ -123,6 +161,7 @@ void GamieHentaiObject::Controller(){
         qDebug() << (mkdir ? "create dir success!" : "create dir error!");
         if(!mkdir){
             utf8_name = QDateTime::currentDateTime().toString("dd_MM_yyyy_hh_mm_ss_zzz");
+            ///utf8_name = "16_06_2024_14_02_00_089";
             save = QCoreApplication::applicationDirPath()+"/"+utf8_name;
             dir.mkdir(save);
         }

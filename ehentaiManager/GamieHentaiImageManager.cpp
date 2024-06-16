@@ -6,7 +6,6 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QFile>
-static unsigned int                      _downloading_number = 0;
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -21,7 +20,7 @@ GamieHentaiImagePageIndexManager::GamieHentaiImagePageIndexManager():_ind(0),_wa
             this , SLOT(OnHasNewImageLink(QVector<GamieHentaiParser::steHentaiItemInfo> &)));
     connect(&_default_timer, SIGNAL(timeout()), this, SLOT(slot_timeout()));
     _default_timer.start(16);
-    for(int i = 0;i < 8;i++)
+    for(int i = 0;i < 3;i++)
         _image_manager_pool.push_back(new GamieHentaiImageManager);
 }
 GamieHentaiImagePageIndexManager::~GamieHentaiImagePageIndexManager(){}
@@ -100,8 +99,6 @@ GamieHentaiImageManager::GamieHentaiImageManager():
     _default_timeout.start(16);
 }
 GamieHentaiImageManager::~GamieHentaiImageManager(){
-    if(_has_req)
-        _downloading_number--;
     _default_timeout.stop();
 }
 void GamieHentaiImageManager::OnRequest(){
@@ -119,7 +116,6 @@ void GamieHentaiImageManager::OnResponse(QByteArray &msg){
     _m->setSaveTo(_save_to);
     _m->setImageManager(this);
     _m->setRequestURL(href);
-    _m->request(href);
 
 #if 0
     qDebug()<<"parse url ->"<<href;
@@ -128,9 +124,11 @@ void GamieHentaiImageManager::OnResponse(QByteArray &msg){
 
     QString path = _save_to + "/" +_m->getImageName();
     if(GamieHentaiImageDownloaderManager::hasFile(path)){
+        _has_free = true;
         return;
     }else
         qDebug() << path << "-> download";
+    _m->request(href);
 
     _has_res = true;
     _has_req = false;

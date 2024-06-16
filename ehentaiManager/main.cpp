@@ -57,7 +57,7 @@ int main(int argc, char *argv[]){
 
     GamieHentaiGlobalSettings::global().setUseNetProxy(true);
     GamieHentaiGlobalSettings::global().setSocks5Proxy("10.255.169.18", 65533);
-    GetObjectInstance()->request(QString("https://e-hentai.org/?f_search=gif"));
+    GetObjectInstance()->request(QString("https://e-hentai.org/?f_search=WaterRing"));
 
     return a.exec();
 }
