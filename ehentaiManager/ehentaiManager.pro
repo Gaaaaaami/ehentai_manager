@@ -9,7 +9,7 @@ CONFIG += c++11 console
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
 DEFINES += USE_CONSOLE_CONTROLLER
-
+#DEFINES += USE_UI_SHOW
 # You can also make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
@@ -28,6 +28,8 @@ LIBS+=-L$$PWD/lib -llibssl -llibcrypto -lcapi -ldasync -llibapps -lopenssl -loss
 SOURCES += \
     GamieHentaiGlobalSettings.cpp \
     GamieHentaiImageManager.cpp \
+    GamieHentaiItemDownloadInfo.cpp \
+    GamieHentaiListDownloadInfo.cpp \
     GamieHentaiObject.cpp \
     GamieHentaiParser.cpp \
     main.cpp
@@ -35,10 +37,13 @@ SOURCES += \
 HEADERS += \
     GamieHentaiGlobalSettings.h \
     GamieHentaiImageManager.h \
+    GamieHentaiItemDownloadInfo.h \
+    GamieHentaiListDownloadInfo.h \
     GamieHentaiObject.h \
     GamieHentaiParser.h
 
-FORMS +=
+FORMS += \
+    GamieHentaiItemDownloadInfo.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

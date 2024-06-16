@@ -32,6 +32,7 @@ void GamieHentaiObject::setSaveTo(QString path){
 void GamieHentaiObject::request(QString url){
     _request_url = url;
 
+    OnRequest();
 
     QList<QNetworkCookie> cookies;
     cookies.append(QNetworkCookie("nw",  "1"));
@@ -42,7 +43,6 @@ void GamieHentaiObject::request(QString url){
     QNetworkReply *rep = _net_manager->get(request);
     connect(rep, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(OnError(QNetworkReply::NetworkError)));
     connect(rep, SIGNAL(downloadProgress(qint64 , qint64 )), this, SLOT(OnProgressChange(qint64 , qint64 )));
-    OnRequest();
 }
 double GamieHentaiObject::getProgress(){
     return _progress;
@@ -116,11 +116,21 @@ void GamieHentaiObject::Controller(){
     QString save = QCoreApplication::applicationDirPath()+"/"+utf8_name;
 
     QDir dir;
-    if(!dir.exists(save))
-        qDebug() << (dir.mkdir(save) ? "create dir success!" : "create dir error!");
+
+    if(!dir.exists(save)){
+        bool mkdir = false;
+        mkdir = dir.mkdir(save);
+        qDebug() << (mkdir ? "create dir success!" : "create dir error!");
+        if(!mkdir){
+            utf8_name = QDateTime::currentDateTime().toString("dd_MM_yyyy_hh_mm_ss_zzz");
+            save = QCoreApplication::applicationDirPath()+"/"+utf8_name;
+            dir.mkdir(save);
+        }
+
+    }
+
     qDebug() << "save to->" << save;
     qDebug() << "request url->" << url;
-
     GamieHentaiImagePageIndexManager *im = new GamieHentaiImagePageIndexManager;
     im->setSaveTo(save);
     im->request(url);
