@@ -27,7 +27,6 @@ private slots:
 
     void on_pushButton_prev_clicked();
 
-    void on_lineEdit_editingFinished();
 
     void on_lineEdit_skip_page_textChanged(const QString &arg1);
 
