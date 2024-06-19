@@ -30,6 +30,7 @@ void GamieHentaiObject::setSaveTo(QString path){
     _save_to = path;
 }
 void GamieHentaiObject::request(QString url){
+    _ehentai_main_index_list.clear();
     _request_url = url;
     qDebug() <<  __FUNCTION__<< url;
     OnRequest();
@@ -45,10 +46,9 @@ void GamieHentaiObject::request(QString url){
     _net_reply = rep;
     connect(rep, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(OnError(QNetworkReply::NetworkError)));
     connect(rep, SIGNAL(downloadProgress(qint64 , qint64 )), this, SLOT(OnProgressChange(qint64 , qint64 )));
-
 }
-
 void GamieHentaiObject::request(QString url, unsigned int already_download_byte){
+    _ehentai_main_index_list.clear();
     _request_url = url;
     qDebug() <<  __FUNCTION__<< url << ", already download byte->" << already_download_byte;
     OnRequest();
@@ -88,7 +88,9 @@ QString GamieHentaiObject::getRequestUrl()
 {
     return _request_url;
 }
-
+QVector<GamieHentaiParser::steHentaiItemInfo> &GamieHentaiObject::getMainIndexList(){
+    return _ehentai_main_index_list;
+}
 void GamieHentaiObject::OnFinished(QNetworkReply *reply){
     if (reply->error() == QNetworkReply::NoError) {
             QByteArray response = reply->readAll();
@@ -128,12 +130,9 @@ void GamieHentaiObject::OnProgressChange(qint64 current, qint64 total){
 
 void GamieHentaiObject::OnNewData(){
     auto data = _net_reply->readAll();
-    //printHex(data.data(), data.length());
-    qDebug() << (data.length()/1024) << "kb";
-
 }
 void GamieHentaiObject::Controller(){
-#ifdef USE_CONSOLE_CONTROLLER
+#ifndef USE_UI_SHOW
     for(auto item: _ehentai_main_index_list)
         qDebug() <<item.index << item.title ;
 

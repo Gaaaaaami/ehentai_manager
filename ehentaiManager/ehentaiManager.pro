@@ -9,7 +9,6 @@ CONFIG += c++11 console
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
 DEFINES += USE_CONSOLE_CONTROLLER
-#DEFINES += USE_UI_SHOW
 # You can also make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
@@ -18,32 +17,38 @@ DEFINES += USE_CONSOLE_CONTROLLER
 INCLUDEPATH+=$$PWD/include
 INCLUDEPATH+=$$PWD/include/openssl
 
-
 win32{
+DEFINES += USE_UI_SHOW
 LIBS+=-L$$PWD/lib -llibssl -llibcrypto -lcapi -ldasync -llibapps -lopenssl -lossltest -lpadlock  -luitest
 }else{
 #LIBS+= -llibssl -llibcrypto -lopenssl
 
 }
 SOURCES += \
+    GamieHentaiDownloadInfoItem.cpp \
     GamieHentaiGlobalSettings.cpp \
     GamieHentaiImageManager.cpp \
-    GamieHentaiItemDownloadInfo.cpp \
-    GamieHentaiListDownloadInfo.cpp \
+    GamieHentaiList.cpp \
+    GamieHentaiMainIndexListItem.cpp \
+    GamieHentaiMainWindow.cpp \
     GamieHentaiObject.cpp \
     GamieHentaiParser.cpp \
     main.cpp
 
 HEADERS += \
+    GamieHentaiDownloadInfoItem.h \
     GamieHentaiGlobalSettings.h \
     GamieHentaiImageManager.h \
-    GamieHentaiItemDownloadInfo.h \
-    GamieHentaiListDownloadInfo.h \
+    GamieHentaiList.h \
+    GamieHentaiMainIndexListItem.h \
+    GamieHentaiMainWindow.h \
     GamieHentaiObject.h \
     GamieHentaiParser.h
 
 FORMS += \
-    GamieHentaiItemDownloadInfo.ui
+    GamieHentaiDownloadInfoItem.ui \
+    GamieHentaiMainIndexListItem.ui \
+    GamieHentaiMainWindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

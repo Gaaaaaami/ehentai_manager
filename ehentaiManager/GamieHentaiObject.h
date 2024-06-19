@@ -25,10 +25,11 @@ public:
      void request(QString url,unsigned int already_download_byte);
      void printHex(char *data, unsigned int le);
 public:
-     double             getProgress();
-     qint64             getCurrent();
-     qint64             getTotal();
-     QString            getRequestUrl();
+     double                                                 getProgress();
+     qint64                                                 getCurrent();
+     qint64                                                 getTotal();
+     QString                                                getRequestUrl();
+      QVector<GamieHentaiParser::steHentaiItemInfo>       & getMainIndexList();
 protected slots:
      virtual void OnFinished(QNetworkReply *reply);
      virtual void OnResponse(QByteArray &msg);

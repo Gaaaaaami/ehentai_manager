@@ -117,10 +117,6 @@ void GamieHentaiImageManager::OnResponse(QByteArray &msg){
     _m->setImageManager(this);
     _m->setRequestURL(href);
 
-#if 0
-    qDebug()<<"parse url ->"<<href;
-    qDebug()<<"save ->"<<_save_to;
-#endif
 
     QString path = _save_to + "/" +_m->getImageName();
     if(GamieHentaiImageDownloaderManager::hasFile(path)){

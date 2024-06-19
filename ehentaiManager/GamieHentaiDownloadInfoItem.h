@@ -1,5 +1,4 @@
-#ifndef GAMIEHENTAIITEMDOWNLOADINFO_H
-#define GAMIEHENTAIITEMDOWNLOADINFO_H
+#pragma once
 
 #include <QWidget>
 #include "GamieHentaiImageManager.h"
@@ -7,13 +6,13 @@ namespace Ui {
 class GamieHentaiItemDownloadInfo;
 }
 
-class GamieHentaiItemDownloadInfo : public QWidget
+class GamieHentaiDownloadInfoItem : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit GamieHentaiItemDownloadInfo(QWidget *parent = nullptr);
-    ~GamieHentaiItemDownloadInfo();
+    explicit GamieHentaiDownloadInfoItem(QWidget *parent = nullptr);
+    ~GamieHentaiDownloadInfoItem();
 public:
     void setImageName(QString name);
     void setValue(double p);
@@ -30,4 +29,3 @@ private:
     GamieHentaiImageDownloaderManager   *_manager;
 };
 
-#endif // GAMIEHENTAIITEMDOWNLOADINFO_H
