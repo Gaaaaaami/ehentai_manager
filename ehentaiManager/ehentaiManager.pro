@@ -22,7 +22,6 @@ DEFINES += USE_UI_SHOW
 LIBS+=-L$$PWD/lib -llibssl -llibcrypto -lcapi -ldasync -llibapps -lopenssl -lossltest -lpadlock  -luitest
 }else{
 #LIBS+= -llibssl -llibcrypto -lopenssl
-
 }
 SOURCES += \
     GamieHentaiDownloadInfoItem.cpp \

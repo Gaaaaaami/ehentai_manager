@@ -67,6 +67,8 @@ void GamieHentaiMainWindow::on_pushButton_search_clicked()
     _url  =url;
     _ehentai_object->request(url);
     _range = 0;
+    ui->lineEdit_skip_page->setText(QString::number(_range));
+
 }
 
 void GamieHentaiMainWindow::on_pushButton_next_clicked()
@@ -101,7 +103,6 @@ void GamieHentaiMainWindow::on_pushButton_prev_clicked()
     ui->lineEdit_skip_page->setText(QString::number(_range));
 
 }
-void GamieHentaiMainWindow::on_lineEdit_editingFinished(){}
 void GamieHentaiMainWindow::on_lineEdit_skip_page_textChanged(const QString &arg1)
 {
     bool ok = false;
