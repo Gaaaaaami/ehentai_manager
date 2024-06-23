@@ -24,42 +24,118 @@ void GamieHentaiGlobalSettings::setSocks5Proxy(QString address, unsigned short p
 void GamieHentaiGlobalSettings::setUseNetProxy(bool val){
     _use_net_proxy = val;
 }
-
-void GamieHentaiGlobalSettings::addDownloaderManager(QString dir, GamieHentaiImageDownloaderManager *p){
+void GamieHentaiGlobalSettings::addDownloaderManager(QString dir, GamieHentaiGlobalSettings::stDownloadFileStatus p){
     auto it = _download_manager.find(dir);
     if( it == _download_manager.end()){
-        QVector<GamieHentaiImageDownloaderManager *> f;
+        QVector<stDownloadFileStatus> f;
         f.clear();
         it = _download_manager.insert(dir , f);
     }
     auto &vector = it.value();
-    vector.push_back(p);
+    bool n = true;
+    for(auto &item : vector)
+        if(item.href == p.href){
+            n = false;
+            break;
+        }
+    if(n){
+        vector.push_back(p);
+    }
+    return;
 }
-void GamieHentaiGlobalSettings::delDownloaderManager(QString dir, GamieHentaiImageDownloaderManager *p){
+
+void GamieHentaiGlobalSettings::addImageTotal(QString dir, unsigned int total){
+    _image_total.insert(dir , total);
+}
+void GamieHentaiGlobalSettings::modDownloaderManager(QString dir, QString request_url, GamieHentaiGlobalSettings::enuImageDownloadStatus status){
+    auto it = _download_manager.find(dir);
+    if( it == _download_manager.end())
+        return;
+    auto &vector = it.value();
+    for(int i = 0; i < vector.size();i++){
+        if(vector[i].href == request_url){
+           vector[i].status = status;
+        }
+    }
+}
+void GamieHentaiGlobalSettings::delDownloaderManager(QString dir, GamieHentaiGlobalSettings::stDownloadFileStatus p){
     auto it = _download_manager.find(dir);
     if( it == _download_manager.end())
         return;
 
     auto &vector = it.value();
     for(int i = 0; i < vector.size();i++){
-        if(vector.at(i) == p){
+        if(vector.at(i).href == p.href){
            vector.remove(i);
-           return;
         }
     }
 }
-void GamieHentaiGlobalSettings::execDownloaderManager(std::function<void (QString, GamieHentaiImageDownloaderManager *)> fun){
+void GamieHentaiGlobalSettings::execDownloaderManager(std::function<void (QString, GamieHentaiGlobalSettings::stDownloadFileStatus)> fun){
     for(auto it = _download_manager.begin();it != _download_manager.end();it++){
         auto &vector = it.value();
-        for(auto *item : vector)
+        for(auto item : vector)
             fun(it.key(), item);
     }
 }
 
+void GamieHentaiGlobalSettings::execDownloaderManager(std::function<void (QString)> fun){
+    for(auto it = _download_manager.begin();it != _download_manager.end();it++){
+        fun(it.key());
+    }
+}
 
+bool GamieHentaiGlobalSettings::checkImageDownloadIsDone(QString dir,unsigned int &success, unsigned int &failed, unsigned int &downloading){
+    unsigned int image_total = GamieHentaiGlobalSettings::global().getImageTotal(dir);
+    if(image_total == 0)
+        return false;
+
+    downloading = 0;
+    failed = 0;
+    success = 0;
+
+
+    auto it = _download_manager.find(dir);
+    if(it ==  _download_manager.end())
+       return false;
+    auto &vector= it.value();
+    for(auto &item :vector){
+        if(GamieHentaiGlobalSettings::DOWNLOADING == item.status){
+            downloading++;
+        }else if(GamieHentaiGlobalSettings::FAILED == item.status){
+            failed++;
+        }else if(GamieHentaiGlobalSettings::SUCCESS == item.status){
+            success++;
+        }
+    }
+
+    if(image_total != (failed+success)){
+        return false;
+    }else {
+        return true;
+    }
+
+}
+unsigned int GamieHentaiGlobalSettings::getImageTotal(QString dir){
+    auto it = _image_total.find(dir);
+    if(it == _image_total.end())
+        return 0;
+    return it.value();
+}
+QVector<GamieHentaiGlobalSettings::stDownloadFileStatus> &GamieHentaiGlobalSettings::getDownloadManager(QString dir){
+    auto it = _download_manager.find(dir);
+    return it.value();
+}
 qint64 GamieHentaiGlobalSettings::runtime()
 {
     return _runtime.elapsed();
+}
+
+unsigned int GamieHentaiGlobalSettings::getDownloadSize(QString dir){
+    auto it = _download_manager.find(dir);
+    if(it ==  _download_manager.end())
+        return 0;
+    auto  &vector = it.value();
+    return vector.size();
 }
 bool GamieHentaiGlobalSettings::useProxy(){
     return _use_net_proxy;

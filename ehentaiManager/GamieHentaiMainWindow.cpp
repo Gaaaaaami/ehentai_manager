@@ -5,6 +5,7 @@
 #include "ui_GamieHentaiMainWindow.h"
 #include <QListWidget>
 #include <QListWidgetItem>
+#include <QDir>
 GamieHentaiMainWindow::GamieHentaiMainWindow(QWidget *parent) :
     QWidget(parent),_ehentai_object(nullptr),_range(0),
     ui(new Ui::GamieHentaiMainWindow){
@@ -45,12 +46,31 @@ void GamieHentaiMainWindow::on_listWidget_main_index_list_itemPressed(QListWidge
 {
     auto it = dynamic_cast<GamieHentaiMainIndexListItem *>(ui->listWidget_main_index_list->itemWidget(item));
     if(it){
+
+
+        QString url = GamieHentaiParser::ToNormalURL(it->getHref());
+
+        QString utf8_name = it->getTitle(); //_ehentai_main_index_list.at(index-1).title.toUtf8();
+        QString save = QCoreApplication::applicationDirPath()+"/"+utf8_name;
+
+        QDir dir;
+
+        if(!dir.exists(save)){
+            bool mkdir = false;
+            mkdir = dir.mkdir(save);
+            qDebug() << (mkdir ? "create dir success!" : "create dir error!");
+            if(!mkdir){
+                utf8_name = QDateTime::currentDateTime().toString("dd_MM_yyyy_hh_mm_ss_zzz");
+                save = QCoreApplication::applicationDirPath()+"/"+utf8_name;
+                dir.mkdir(save);
+            }
+
+        }
         qDebug() << it->getTitle() << it->getHref();
-#if 0
+
         GamieHentaiImagePageIndexManager *im = new GamieHentaiImagePageIndexManager;
         im->setSaveTo(save);
         im->request(url);
-#endif
     }
 }
 

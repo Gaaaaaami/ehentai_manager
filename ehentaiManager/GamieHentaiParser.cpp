@@ -325,6 +325,15 @@ QString GamieHentaiParser::GetImageDownloadHref(){
     return final;
 }
 
+unsigned int GamieHentaiParser::GetImageTotol(){
+
+    QString content = GetTagEnd(R"(<p class="gpc">Showing)");
+    QStringList list = content.split(" ");
+
+    if(list.size() < 2)
+        return 0;
+    return list.at(list.size()-2).toUInt();
+}
 QString GamieHentaiParser::ToNormalURL(QString addr){
     addr.remove( addr.length()-1,1);
     addr.remove( 0,1);

@@ -47,24 +47,25 @@ void GamieHentaiObject::request(QString url){
     connect(rep, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(OnError(QNetworkReply::NetworkError)));
     connect(rep, SIGNAL(downloadProgress(qint64 , qint64 )), this, SLOT(OnProgressChange(qint64 , qint64 )));
 }
-void GamieHentaiObject::request(QString url, unsigned int already_download_byte){
+void GamieHentaiObject::request(QString url, QString save_to){
     _ehentai_main_index_list.clear();
     _request_url = url;
-    qDebug() <<  __FUNCTION__<< url << ", already download byte->" << already_download_byte;
+    //qDebug() <<  __FUNCTION__<< url;
     OnRequest();
 
     QList<QNetworkCookie> cookies;
     cookies.append(QNetworkCookie("nw",  "1"));
     _net_cookie->setCookiesFromUrl(cookies, url);
-    QString rangeHeader = QString("bytes=%1-").arg(QString::number(already_download_byte));
+
     QNetworkRequest request;
-    request.setRawHeader("Range", rangeHeader.toUtf8());
+    request.setRawHeader("Connection", "keep-alive");
     request.setUrl(QUrl(url));
     QNetworkReply *rep = _net_manager->get(request);
     _net_reply = rep;
     connect(rep, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(OnError(QNetworkReply::NetworkError)));
-    connect(rep, SIGNAL(readyRead()), this, SLOT(OnNewData()));
+    connect(rep, SIGNAL(downloadProgress(qint64 , qint64 )), this, SLOT(OnProgressChange(qint64 , qint64 )));
 }
+
 void GamieHentaiObject::printHex(char *data, unsigned int le){
     for(int i = 0; i< le;i++){
         int d = data[i];
@@ -107,7 +108,7 @@ void GamieHentaiObject::OnError(QNetworkReply::NetworkError err){
     //超时重连机制
     if(err != QNetworkReply::NoError){
 
-        qDebug() << __FUNCTION__ << err;
+        //qDebug() << __FUNCTION__ << err;
         _retry_count++;
         OnRetry(_retry_count);
     }
@@ -117,7 +118,7 @@ void GamieHentaiObject::OnRetry(int count){
     QNetworkRequest request;
     request.setUrl(QUrl(_request_url));
     QNetworkReply *rep = _net_manager->get(request);
-    qDebug() << __FUNCTION__ << _request_url;
+   // qDebug() << __FUNCTION__ << _request_url;
     connect(rep, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(OnError(QNetworkReply::NetworkError)));
 }
 

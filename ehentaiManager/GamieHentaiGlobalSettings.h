@@ -10,7 +10,20 @@ class QImage;
 class QNetworkProxy;
 class GamieHentaiImageDownloaderManager;
 class GamieHentaiImageManager;
+
+
 class GamieHentaiGlobalSettings{
+public:
+    enum enuImageDownloadStatus{
+        SUCCESS,
+        FAILED,
+        DOWNLOADING
+    };
+    typedef struct{
+        enuImageDownloadStatus status;
+        QString title;
+        QString href;
+    }stDownloadFileStatus;
 public:
     GamieHentaiGlobalSettings();
     virtual ~GamieHentaiGlobalSettings();
@@ -20,14 +33,19 @@ public:
     void setSocks5Proxy(QString url, unsigned short port);
     void setUseNetProxy(bool val);
 public:
-    void addDownloaderManager(QString dir, GamieHentaiImageDownloaderManager*  p);
-    void delDownloaderManager(QString dir, GamieHentaiImageDownloaderManager*  p);
-    void execDownloaderManager(std::function<void(QString , GamieHentaiImageDownloaderManager *)> fun);
-
-
+    void addDownloaderManager(QString dir, GamieHentaiGlobalSettings::stDownloadFileStatus  p);
+    void addImageTotal(QString dir ,unsigned int total);
+    void modDownloaderManager(QString dir, QString request_url, GamieHentaiGlobalSettings::enuImageDownloadStatus status);
+    void delDownloaderManager(QString dir, GamieHentaiGlobalSettings::stDownloadFileStatus  p);
+    void execDownloaderManager(std::function<void(QString , GamieHentaiGlobalSettings::stDownloadFileStatus)> fun);
+    void execDownloaderManager(std::function<void(QString )> fun);
+public:
+    bool         checkImageDownloadIsDone(QString dir, unsigned int &success, unsigned int &failed, unsigned int &downloading);
+    unsigned int getImageTotal(QString dir);
+    QVector<GamieHentaiGlobalSettings::stDownloadFileStatus>    &getDownloadManager(QString dir);
 public:
     qint64          runtime();
-    unsigned int    imageDownloadingSize();
+    unsigned int    getDownloadSize(QString dir);
 public:
     bool             useProxy();
     QNetworkProxy   &getProxy();
@@ -35,7 +53,8 @@ private:
     QNetworkProxy                                                           *_net_proxy;
     bool                                                                     _use_net_proxy;
 private:
-    QMap<QString,QVector<GamieHentaiImageDownloaderManager *>>               _download_manager;
+    QMap<QString,QVector<GamieHentaiGlobalSettings::stDownloadFileStatus>>   _download_manager;
+    QMap<QString,unsigned int>                                               _image_total;
     QElapsedTimer                                                            _runtime;
 private:
     unsigned int                                                             _max_download_number;

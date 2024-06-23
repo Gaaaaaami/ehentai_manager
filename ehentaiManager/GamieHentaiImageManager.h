@@ -64,6 +64,8 @@ public:
 public:
     virtual void OnRequest() override;
     virtual void OnResponse(QByteArray &msg) override;
+    virtual void OnError(QNetworkReply::NetworkError err) override;
+
 public:
     bool hasResponse();
     bool hasFree();
@@ -100,7 +102,8 @@ public:
     virtual void OnRetry(int count) override;
     virtual void OnRequest() override;
     virtual void OnProgressChange(qint64 current, qint64 total) override;
-
+    virtual void OnDownloadedSuccess();
+    virtual void OnDownloadedFailed();
 public:
     static bool hasFile(QString path);
     void setRequestURL(QString url);
@@ -114,9 +117,9 @@ signals:
     void signal_delete();
     void signal_reconnect(QString url);
 protected:
-    QString                     _image_href;
-    QString                     _image_name;
-    GamieHentaiImageManager    *_manager;
+    QString                                                          _image_href;
+    QString                                                          _image_name;
+    GamieHentaiImageManager                                         *_manager;
 };
 
 #endif // GAMIEHENTAIIMAGEMANAGER_H

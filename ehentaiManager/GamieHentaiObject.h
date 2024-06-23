@@ -22,7 +22,7 @@ public:
 public:
      void setSaveTo(QString path);
      void request(QString url);
-     void request(QString url,unsigned int already_download_byte);
+     void request(QString url, QString save_to);
      void printHex(char *data, unsigned int le);
 public:
      double                                                 getProgress();
