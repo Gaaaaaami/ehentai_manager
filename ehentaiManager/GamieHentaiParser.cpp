@@ -325,6 +325,29 @@ QString GamieHentaiParser::GetImageDownloadHref(){
     return final;
 }
 
+QString GamieHentaiParser::GetErrorNL(){
+   // const char  *n = R"(<a href="#" id="loadfail" onclick="return nl('2705-477579')">Reload broken image</a>)";
+
+    QString n = R"(<a href="#" id="loadfail" onclick=")";
+    int index = _msg.indexOf(n);
+    if(index == -1)
+        return "";
+
+    QString t= GetTagEnd(n);
+
+   QString onclick= GetAttribute(t, "onclick");
+   QStringList lst = t.split(" ");
+
+   if(lst.empty())
+       return "";
+
+   lst = lst.at(4).split("'");
+    if(lst.size() < 2)
+        return "";
+   return  lst.at(1);
+
+}
+
 unsigned int GamieHentaiParser::GetImageTotol(){
 
     QString content = GetTagEnd(R"(<p class="gpc">Showing)");
@@ -332,7 +355,12 @@ unsigned int GamieHentaiParser::GetImageTotol(){
 
     if(list.size() < 2)
         return 0;
-    return list.at(list.size()-2).toUInt();
+    QString c = list.at(list.size()-2);
+    QString f  ="";
+    for(auto &it :c )
+        if(it.isNumber())
+           f += it;
+    return f.toUInt();
 }
 QString GamieHentaiParser::ToNormalURL(QString addr){
     addr.remove( addr.length()-1,1);

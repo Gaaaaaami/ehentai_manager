@@ -42,7 +42,7 @@ void GamieHentaiList::delItemList(GamieHentaiImageDownloaderManager *manager){
         auto item = this->item(i);
         GamieHentaiDownloadInfoItem *widget = (GamieHentaiDownloadInfoItem*)this->itemWidget(item);
         if(widget->getManager() == manager){
-            qDebug() << __FUNCTION__ << ", index -> " << i;
+            //qDebug() << __FUNCTION__ << ", index -> " << i;
             this->takeItem(i);
             return;
         }

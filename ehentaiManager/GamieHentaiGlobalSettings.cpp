@@ -3,6 +3,7 @@
 #include <QNetworkProxy>
 
 GamieHentaiGlobalSettings::GamieHentaiGlobalSettings():_max_download_number(7){
+    _page_index_manager = nullptr;
     _net_proxy = new QNetworkProxy;
     _runtime.start();
 }
@@ -125,6 +126,64 @@ QVector<GamieHentaiGlobalSettings::stDownloadFileStatus> &GamieHentaiGlobalSetti
     auto it = _download_manager.find(dir);
     return it.value();
 }
+
+void GamieHentaiGlobalSettings::addDownloadListItem(GamieHentaiGlobalSettings::stDownloadListItem &item){
+    _download_list_item.push_back(item);
+}
+void GamieHentaiGlobalSettings::modDownloadListItemState(QString save, GamieHentaiGlobalSettings::enuImageDownloadStatus state){
+    for(auto &it : _download_list_item)
+        if(it.save == save){
+           it.state = state;
+        }
+}
+
+void GamieHentaiGlobalSettings::downloadNextNoDownloadStateListItem(){
+    if(hasDownloadListItemDownloading())
+        return;
+    for(auto & it : _download_list_item){
+        if(it.state == GamieHentaiGlobalSettings::NO_START_DOWNLOADING)
+        {
+           qDebug() << it.href << "download now...";
+           it.state = GamieHentaiGlobalSettings::DOWNLOADING;
+           if(_page_index_manager == nullptr)
+              _page_index_manager = new GamieHentaiImagePageIndexManager;
+
+           _page_index_manager->setSaveTo(it.save);
+           _page_index_manager->request(it.href);
+           return;
+        }
+    }
+
+}
+
+bool GamieHentaiGlobalSettings::hasDownloadListItemDownloading(){
+    for(auto & it : _download_list_item){
+        if(it.state == GamieHentaiGlobalSettings::DOWNLOADING)
+            return true;
+    }
+    return false;
+}
+
+void GamieHentaiGlobalSettings::update(){
+    execDownloaderManager([&](QString dir){
+        unsigned int success,failed,downloading;
+        bool n = GamieHentaiGlobalSettings::global().checkImageDownloadIsDone(dir, success, failed , downloading);
+        unsigned int image_total = GamieHentaiGlobalSettings::global().getImageTotal(dir);
+        if((success+failed) == image_total){
+            modDownloadListItemState(dir, GamieHentaiGlobalSettings::SUCCESS);
+        }
+        qDebug() << dir <<  (success+failed) << "/"<<image_total;
+    });
+    downloadNextNoDownloadStateListItem();
+
+
+    for(auto &it : _download_list_item)
+        if(it.state == GamieHentaiGlobalSettings::NO_START_DOWNLOADING)
+            qDebug() << it.save << it.href << " -"<< "waiting";
+}
+
+
+
 qint64 GamieHentaiGlobalSettings::runtime()
 {
     return _runtime.elapsed();

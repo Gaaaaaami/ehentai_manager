@@ -19,6 +19,7 @@ public:
 public:
      GamieHentaiImageManager *getValidImageManager();
 public:
+    virtual void OnRequest() override;
     virtual void OnResponse(QByteArray &msg) override;
 protected slots:
     virtual void slot_timeout();
@@ -108,6 +109,7 @@ public:
     static bool hasFile(QString path);
     void setRequestURL(QString url);
     void setImageHref(QString href);
+    void setNL(QString nl);
     void setImageManager(GamieHentaiImageManager *manager);
 public:
     QString getImageHref();
@@ -119,7 +121,10 @@ signals:
 protected:
     QString                                                          _image_href;
     QString                                                          _image_name;
+    QString                                                          _nl;
     GamieHentaiImageManager                                         *_manager;
+protected:
+    bool                                                             _retry;
 };
 
 #endif // GAMIEHENTAIIMAGEMANAGER_H

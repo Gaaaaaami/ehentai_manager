@@ -23,6 +23,8 @@ public:
     QVector<steHentaiItemInfo>                                   GetPageIndexToArray();
 public:
     QString                                                      GetImageDownloadHref();
+    QString                                                      GetErrorNL();
+
     unsigned int                                                 GetImageTotol();
 public:
     static QString                                                      ToNormalURL(QString addr);

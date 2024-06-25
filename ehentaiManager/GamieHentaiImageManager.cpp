@@ -31,11 +31,19 @@ GamieHentaiImageManager *GamieHentaiImagePageIndexManager::getValidImageManager(
             return item;
     return nullptr;
 }
+
+void GamieHentaiImagePageIndexManager::OnRequest(){
+    _wait = false;
+    _ind = 0;
+    _image_href_list.clear();
+    _page_href.clear();
+}
 void GamieHentaiImagePageIndexManager::OnResponse(QByteArray &msg){
     GamieHentaiParser parser(msg);
     if(_page_href.size() == 0){
        _page_href = parser.GetImageList_PageHref();
-       GamieHentaiGlobalSettings::global().addImageTotal(   _save_to,     parser.GetImageTotol());
+       int total = parser.GetImageTotol();
+       GamieHentaiGlobalSettings::global().addImageTotal(   _save_to,   total  );
        _m->setSaveTo(_save_to);
     }
 }
@@ -56,7 +64,7 @@ void GamieHentaiImagePageIndexManager::slot_timeout(){
     if(_image_href_list.empty()){
         if(_ind < _page_href.size() && !_wait){
             _wait = true;
-            qDebug() << "req->" << _page_href.at(_ind).herf;
+            //qDebug() << "req->" << _page_href.at(_ind).herf;
            _m->request(_page_href.at(_ind).herf);
            _ind++;
         }
@@ -104,6 +112,8 @@ void GamieHentaiImageManager::OnRequest(){
 }
 void GamieHentaiImageManager::OnResponse(QByteArray &msg){
     GamieHentaiParser parser(msg);
+    QString re_nl = parser.GetErrorNL();
+
     QString href = parser.GetImageDownloadHref();
     if(_m == nullptr){
        _m = new GamieHentaiImageDownloaderManager;
@@ -114,11 +124,7 @@ void GamieHentaiImageManager::OnResponse(QByteArray &msg){
     _m->setSaveTo(_save_to);
     _m->setImageManager(this);
     _m->setRequestURL(href);
-
-    static unsigned int pass_total = 0;
-
-
-
+    _m->setNL(re_nl);
 
     QString image_name;
     QStringList lst = _request_url.split("/");
@@ -132,7 +138,6 @@ void GamieHentaiImageManager::OnResponse(QByteArray &msg){
 
 
 
-    qDebug() << "check out has file -> " << path;
 
 
     if(GamieHentaiImageDownloaderManager::hasFile(path)){
@@ -141,13 +146,9 @@ void GamieHentaiImageManager::OnResponse(QByteArray &msg){
         p.title = image_name;
         p.status = GamieHentaiGlobalSettings::SUCCESS;
         GamieHentaiGlobalSettings::global().addDownloaderManager(_save_to, p);
-
-        qDebug() << path << "pass" << pass_total;
-        pass_total++;
         _has_free = true;
         return;
     }else{
-        qDebug() << path << "-> download";
         _m->request(href);
     }
     _has_res = true;
@@ -165,6 +166,7 @@ bool GamieHentaiImageManager::hasFree(){
     return _has_free;
 }
 void GamieHentaiImageManager::slot_reconnect(QString url){
+    qDebug() << __FUNCTION__ << url;
     _has_res =false;
     _has_reconnect =true;
     request(url);
@@ -194,53 +196,60 @@ GamieHentaiImageDownloaderManager::~GamieHentaiImageDownloaderManager(){
     OnDownloaderManagerRelease(this);
 }
 void GamieHentaiImageDownloaderManager::OnResponse(QByteArray &msg){
-    qDebug() <<getRequestUrl()<< "downloaded";
+   // qDebug() <<getRequestUrl()<< "downloaded";
     OnDownloadedSuccess();
-
+    _retry_count = 0;
     QString save_to = _save_to + "/";
     QString name = _image_name;
     save_to += name;
     int ret = -1;
     QFile file(save_to);
     if(file.open(QFile::WriteOnly)){
-       qDebug() << getFixedImageName() << ", √";
+       //qDebug() << getFixedImageName() << ", √";
        ret = file.write(msg);
        file.close();
        _manager->_has_free = true;
-    }else{
-        OnRetry(_retry_count);
-        _retry_count++;
     }
 }
 void GamieHentaiImageDownloaderManager::OnRetry(int count){
-    qDebug() << __FUNCTION__ << count;
+    //qDebug() << __FUNCTION__ << count;
+    if(_retry)
+        return;
+    _retry = true;
     if(count >= 3){
+       _retry_count = 0;
        _net_manager->clearAccessCache();
        _net_manager->clearConnectionCache();
-       _retry_count = 0;
        OnDownloadedFailed();
        _manager->_has_free = true;
        qDebug() << "retry count >= 3, so cancel download on this time.";
+       qDebug() << _image_href;
+       qDebug() << _request_url;
        return;
     }
-
-    qDebug() << __FUNCTION__ << getImageHref() << getImageName();
-
+    qDebug() << "retry -> " << _request_url << count;
     _net_manager->clearAccessCache();
     _net_manager->clearConnectionCache();
-
     QString image_href = _image_href;
-    if(std::isnan(getProgress()) || _total == 0)
-       image_href+= "?nl=39299-477344";
-    emit signal_reconnect(image_href);
+    ///if(std::isnan(getProgress()) || _total == 0 )
+    if(_nl.length() != 0)
+        if(image_href.indexOf("?nl="+_nl) == -1)
+           image_href+= "?nl="+_nl;
+
+    _manager->slot_reconnect(image_href);
 }
 void GamieHentaiImageDownloaderManager::OnRequest(){
+    _retry = false;
     QStringList lst = getImageHref().split("/");
+    if(!lst.empty()){
+        QString c = lst[lst.size()-1];
+        int index = c.indexOf("?nl=");
+        if(index != -1){
+           c = c.remove(index, c.length() - index);
+        }
+        _image_name = c+"_"+ getImageName();
 
-
-    if(!lst.empty())
-        _image_name = lst[lst.size()-1]+"_"+ getImageName();
-    else
+    }else
         _image_name = getImageName();
 
     GamieHentaiGlobalSettings::stDownloadFileStatus p ;
@@ -253,10 +262,17 @@ void GamieHentaiImageDownloaderManager::OnProgressChange(qint64 current, qint64 
     _current = current;
     _total = total;
     _progress = double(current) / double(total);
-    qDebug() << getFixedImageName() << ", progress->"<<(_progress * 100.0) << "%";
-    if(std::isnan(getProgress()) || _total == 0){
-        OnRetry(_retry_count);
-        _retry_count++;
+    //qDebug() << getFixedImageName() << ", progress->"<<(_progress * 100.0) << "%";
+    if(std::isnan(getProgress()) || _total == 0  ){
+        if(_net_reply)
+            if(_net_reply->isRunning()){
+
+               _net_reply->close();
+               _net_reply->deleteLater();
+
+               OnRetry(_retry_count);
+               _retry_count++;
+            }
     }
 }
 void GamieHentaiImageDownloaderManager::OnDownloadedSuccess(){
@@ -265,6 +281,7 @@ void GamieHentaiImageDownloaderManager::OnDownloadedSuccess(){
                                                              GamieHentaiGlobalSettings::enuImageDownloadStatus::SUCCESS);
 }
 void GamieHentaiImageDownloaderManager::OnDownloadedFailed(){
+    qDebug() << __FUNCTION__ << _request_url << _image_href << _image_name;
     GamieHentaiGlobalSettings::global().modDownloaderManager(_save_to,
                                                              _request_url,
                                                              GamieHentaiGlobalSettings::enuImageDownloadStatus::FAILED);
@@ -278,6 +295,10 @@ void GamieHentaiImageDownloaderManager::setRequestURL(QString url){
 }
 void GamieHentaiImageDownloaderManager::setImageHref(QString href){
     _image_href = href;
+}
+
+void GamieHentaiImageDownloaderManager::setNL(QString nl){
+    _nl = nl;
 }
 
 void GamieHentaiImageDownloaderManager::setImageManager(GamieHentaiImageManager *manager)   {

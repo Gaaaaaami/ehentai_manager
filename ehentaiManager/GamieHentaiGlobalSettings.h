@@ -10,20 +10,26 @@ class QImage;
 class QNetworkProxy;
 class GamieHentaiImageDownloaderManager;
 class GamieHentaiImageManager;
-
+class GamieHentaiImagePageIndexManager;
 
 class GamieHentaiGlobalSettings{
 public:
     enum enuImageDownloadStatus{
         SUCCESS,
         FAILED,
-        DOWNLOADING
+        DOWNLOADING,
+        NO_START_DOWNLOADING,
     };
     typedef struct{
         enuImageDownloadStatus status;
         QString title;
         QString href;
     }stDownloadFileStatus;
+    typedef struct{
+        QString href;
+        QString save;
+        enuImageDownloadStatus    state;
+    }stDownloadListItem;
 public:
     GamieHentaiGlobalSettings();
     virtual ~GamieHentaiGlobalSettings();
@@ -44,6 +50,13 @@ public:
     unsigned int getImageTotal(QString dir);
     QVector<GamieHentaiGlobalSettings::stDownloadFileStatus>    &getDownloadManager(QString dir);
 public:
+    void addDownloadListItem(stDownloadListItem &item);
+    void modDownloadListItemState(QString save , GamieHentaiGlobalSettings::enuImageDownloadStatus );
+    void downloadNextNoDownloadStateListItem();
+    bool hasDownloadListItemDownloading();
+public:
+    void update();
+public:
     qint64          runtime();
     unsigned int    getDownloadSize(QString dir);
 public:
@@ -57,6 +70,11 @@ private:
     QMap<QString,unsigned int>                                               _image_total;
     QElapsedTimer                                                            _runtime;
 private:
+    QVector<stDownloadListItem>                                              _download_list_item;
+private:
     unsigned int                                                             _max_download_number;
+private:
+    GamieHentaiImagePageIndexManager                                        *_page_index_manager;
+
 };
 

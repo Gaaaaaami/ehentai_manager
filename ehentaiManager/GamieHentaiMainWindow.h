@@ -30,6 +30,10 @@ private slots:
 
     void on_lineEdit_skip_page_textChanged(const QString &arg1);
 
+    void on_lineEdit_uploader_editingFinished();
+
+    void on_lineEdit_search_editingFinished();
+
 private:
     Ui::GamieHentaiMainWindow *ui;
 private:

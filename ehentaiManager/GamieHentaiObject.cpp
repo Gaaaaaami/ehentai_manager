@@ -32,7 +32,7 @@ void GamieHentaiObject::setSaveTo(QString path){
 void GamieHentaiObject::request(QString url){
     _ehentai_main_index_list.clear();
     _request_url = url;
-    qDebug() <<  __FUNCTION__<< url;
+    //qDebug() <<  __FUNCTION__<< url;
     OnRequest();
 
     QList<QNetworkCookie> cookies;
@@ -165,7 +165,6 @@ void GamieHentaiObject::Controller(){
             save = QCoreApplication::applicationDirPath()+"/"+utf8_name;
             dir.mkdir(save);
         }
-
     }
 
     qDebug() << "save to->" << save;

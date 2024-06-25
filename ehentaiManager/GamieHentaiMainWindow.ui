@@ -50,6 +50,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QLineEdit" name="lineEdit_uploader">
+       <property name="placeholderText">
+        <string>搜索上传者</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="pushButton_search">
        <property name="text">
         <string>搜索</string>
