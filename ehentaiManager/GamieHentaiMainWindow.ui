@@ -10,6 +10,11 @@
     <height>600</height>
    </rect>
   </property>
+  <property name="font">
+   <font>
+    <family>Arial Black</family>
+   </font>
+  </property>
   <property name="windowTitle">
    <string>ehentai viewer </string>
   </property>
@@ -66,7 +71,13 @@
     </layout>
    </item>
    <item>
-    <widget class="QListWidget" name="listWidget_main_index_list"/>
+    <widget class="QListWidget" name="listWidget_main_index_list">
+     <property name="font">
+      <font>
+       <family>Consolas</family>
+      </font>
+     </property>
+    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_index_box">

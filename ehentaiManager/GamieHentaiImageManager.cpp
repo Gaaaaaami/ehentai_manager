@@ -155,10 +155,6 @@ void GamieHentaiImageManager::OnResponse(QByteArray &msg){
     _has_req = false;
 }
 
-void GamieHentaiImageManager::OnError(QNetworkReply::NetworkError err)
-{
-    qDebug() << __FUNCTION__ << err;
-}
 bool GamieHentaiImageManager::hasResponse(){
     return _has_res;
 }
@@ -198,13 +194,14 @@ GamieHentaiImageDownloaderManager::~GamieHentaiImageDownloaderManager(){
 void GamieHentaiImageDownloaderManager::OnResponse(QByteArray &msg){
    // qDebug() <<getRequestUrl()<< "downloaded";
     OnDownloadedSuccess();
-    _retry_count = 0;
     QString save_to = _save_to + "/";
     QString name = _image_name;
     save_to += name;
     int ret = -1;
     QFile file(save_to);
     if(file.open(QFile::WriteOnly)){
+        _retry_count = 0;
+
        //qDebug() << getFixedImageName() << ", √";
        ret = file.write(msg);
        file.close();

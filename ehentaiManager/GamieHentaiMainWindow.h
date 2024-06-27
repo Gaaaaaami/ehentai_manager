@@ -12,7 +12,11 @@ class GamieHentaiObject;
 class GamieHentaiMainWindow : public QWidget
 {
     Q_OBJECT
-
+private:
+    enum enuFinishedEditLine{
+        SEARCH_IMAGE_NAME,
+        SEARCH_IAMGE_UPLOADER
+    };
 public:
     explicit GamieHentaiMainWindow(QWidget *parent = nullptr);
     ~GamieHentaiMainWindow();
@@ -24,16 +28,10 @@ private slots:
     void on_listWidget_main_index_list_itemPressed(QListWidgetItem *item);
     void on_pushButton_search_clicked();
     void on_pushButton_next_clicked();
-
     void on_pushButton_prev_clicked();
-
-
     void on_lineEdit_skip_page_textChanged(const QString &arg1);
-
     void on_lineEdit_uploader_editingFinished();
-
     void on_lineEdit_search_editingFinished();
-
 private:
     Ui::GamieHentaiMainWindow *ui;
 private:
@@ -42,6 +40,8 @@ private:
     QString                  _url;
 private:
     unsigned int             _range;
+private:
+    enuFinishedEditLine      _finished_mode;
 };
 
 #endif // GAMIEHENTAIMAINWINDOW_H

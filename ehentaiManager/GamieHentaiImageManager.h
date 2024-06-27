@@ -65,7 +65,6 @@ public:
 public:
     virtual void OnRequest() override;
     virtual void OnResponse(QByteArray &msg) override;
-    virtual void OnError(QNetworkReply::NetworkError err) override;
 
 public:
     bool hasResponse();

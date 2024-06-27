@@ -12,6 +12,7 @@ GamieHentaiMainWindow::GamieHentaiMainWindow(QWidget *parent) :
     ui->setupUi(this);
     connect(&_default_timer, SIGNAL(timeout()), this, SLOT(slot_timeout()));
     _default_timer.start(16);
+    _finished_mode = enuFinishedEditLine::SEARCH_IMAGE_NAME;
 }
 GamieHentaiMainWindow::~GamieHentaiMainWindow(){
     delete ui;
@@ -101,7 +102,32 @@ void GamieHentaiMainWindow::on_listWidget_main_index_list_itemPressed(QListWidge
 
 void GamieHentaiMainWindow::on_pushButton_search_clicked()
 {
-
+    if( enuFinishedEditLine::SEARCH_IMAGE_NAME == _finished_mode){
+        QString search_text = ui->lineEdit_search->text();
+        for(auto &it : search_text)
+            if(it == " ")
+               it = '+';
+        ui->listWidget_main_index_list->clear();
+        ui->progressBar_load_progress->setValue(0);
+        QString url = "https://e-hentai.org/";
+        url += "?f_search="+search_text;
+        _url  =url;
+        _ehentai_object->request(url);
+        _range = 0;
+        ui->lineEdit_skip_page->setText(QString::number(_range));
+    }else if( enuFinishedEditLine::SEARCH_IAMGE_UPLOADER == _finished_mode){
+        QString search_text = ui->lineEdit_uploader->text();
+        for(auto &it : search_text)
+            if(it == " ")
+               it = '+';
+        ui->listWidget_main_index_list->clear();
+        ui->progressBar_load_progress->setValue(0);
+        QString url = "https://e-hentai.org/uploader/" + search_text;
+        _url  =url;
+       _ehentai_object->request(url);
+        _range = 0;
+        ui->lineEdit_skip_page->setText(QString::number(_range));
+    }
 
 }
 
@@ -136,8 +162,12 @@ void GamieHentaiMainWindow::on_pushButton_prev_clicked()
     ui->listWidget_main_index_list->clear();
 
     QString url = _url + "&range=" + QString::number(_range*2);
-    if(_ehentai_object->getRequestUrl().indexOf("f_search") == -1 )
+    if(_ehentai_object->getRequestUrl().indexOf("f_search") == -1 &&
+       _ehentai_object->getRequestUrl().indexOf("e-hentai.org/uploader") == -1)
         url = "https://e-hentai.org/?range="+QString::number(_range*2);
+    else  if(_ehentai_object->getRequestUrl().indexOf("e-hentai.org/uploader") != -1){
+        url = _url +"?range="+QString::number(_range*2);
+    }
     _ehentai_object->request(url);
 
     ui->lineEdit_skip_page->setText(QString::number(_range));
@@ -153,8 +183,12 @@ void GamieHentaiMainWindow::on_lineEdit_skip_page_textChanged(const QString &arg
         ui->progressBar_load_progress->setValue(0);
         ui->listWidget_main_index_list->clear();
         QString url = _url + "&range=" + QString::number(_range*2);
-        if(_ehentai_object->getRequestUrl().indexOf("f_search") == -1 )
+        if(_ehentai_object->getRequestUrl().indexOf("f_search") == -1 &&
+           _ehentai_object->getRequestUrl().indexOf("e-hentai.org/uploader") == -1)
             url = "https://e-hentai.org/?range="+QString::number(_range*2);
+        else  if(_ehentai_object->getRequestUrl().indexOf("e-hentai.org/uploader") != -1){
+            url = _url +"?range="+QString::number(_range*2);
+        }
         _ehentai_object->request(url);
     }else{
         QString n =arg1;
@@ -168,31 +202,12 @@ void GamieHentaiMainWindow::on_lineEdit_skip_page_textChanged(const QString &arg
 }
 
 void GamieHentaiMainWindow::on_lineEdit_uploader_editingFinished() {
-    QString search_text = ui->lineEdit_uploader->text();
-    for(auto &it : search_text)
-        if(it == " ")
-           it = '+';
-    ui->listWidget_main_index_list->clear();
-    ui->progressBar_load_progress->setValue(0);
-    QString url = "https://e-hentai.org/uploader/" + search_text;
-    _url  =url;
-    _ehentai_object->request(url);
-    _range = 0;
-    ui->lineEdit_skip_page->setText(QString::number(_range));
+
+    _finished_mode = enuFinishedEditLine::SEARCH_IAMGE_UPLOADER;
 
 }
 void GamieHentaiMainWindow::on_lineEdit_search_editingFinished()
 {
-    QString search_text = ui->lineEdit_search->text();
-    for(auto &it : search_text)
-        if(it == " ")
-           it = '+';
-    ui->listWidget_main_index_list->clear();
-    ui->progressBar_load_progress->setValue(0);
-    QString url = "https://e-hentai.org/";
-    url += "?f_search="+search_text;
-    _url  =url;
-    _ehentai_object->request(url);
-    _range = 0;
-    ui->lineEdit_skip_page->setText(QString::number(_range));
+
+    _finished_mode = enuFinishedEditLine::SEARCH_IMAGE_NAME;
 }

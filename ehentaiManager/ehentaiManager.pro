@@ -25,6 +25,7 @@ LIBS+=-L$$PWD/lib -llibssl -llibcrypto -lcapi -ldasync -llibapps -lopenssl -loss
 }
 SOURCES += \
     GamieHentaiDownloadInfoItem.cpp \
+    GamieHentaiFileSystem.cpp \
     GamieHentaiGlobalSettings.cpp \
     GamieHentaiImageManager.cpp \
     GamieHentaiList.cpp \
@@ -36,6 +37,7 @@ SOURCES += \
 
 HEADERS += \
     GamieHentaiDownloadInfoItem.h \
+    GamieHentaiFileSystem.h \
     GamieHentaiGlobalSettings.h \
     GamieHentaiImageManager.h \
     GamieHentaiList.h \
