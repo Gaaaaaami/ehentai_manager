@@ -2,11 +2,18 @@
 #include "GamieHentaiImageManager.h"
 #include "GamieHentaiGlobalSettings.h"
 #include "GamieHentaiMainWindow.h"
+#include "GamieHentaiList.h"
+#include "GamieHentaiDownloadInfoItem.h"
 #include <QTimer>
 #include <QElapsedTimer>
 #include <QObject>
 #include <QApplication>
 #include <QCoreApplication>
+
+GamieHentaiList             *GetDownloadingList(){
+    static GamieHentaiList w;
+    return &w;
+}
 GamieHentaiMainWindow       *GetMainWindowInstance(){
     static GamieHentaiMainWindow w;
     return &w;
@@ -28,15 +35,12 @@ int main(int argc, char *argv[]){
     GamieHentaiGlobalSettings::global().setUseNetProxy(true);
     GamieHentaiGlobalSettings::global().setSocks5Proxy("10.255.169.18", 65533);
 
-#if 1
+
+    GetDownloadingList();
     GetMainWindowInstance()->BindehentaiObject(GetObjectInstance());
     GetMainWindowInstance()->show();
     GetObjectInstance()->request(QString("https://e-hentai.org/"));
-#else
-    GamieHentaiImageManager *im =new GamieHentaiImageManager;
-    im->setSaveTo("./");
-    im->request("https://e-hentai.org/s/87d5dfb51a/2812298-10");
-#endif
+
     return a.exec();
 }
 

@@ -54,6 +54,7 @@ public:
     void modDownloadListItemState(QString save , GamieHentaiGlobalSettings::enuImageDownloadStatus );
     void downloadNextNoDownloadStateListItem();
     bool hasDownloadListItemDownloading();
+    stDownloadListItem getDownloadListItem(QString dir);
 public:
     void update();
 public:

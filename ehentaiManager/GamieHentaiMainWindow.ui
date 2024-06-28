@@ -10,9 +10,21 @@
     <height>600</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>800</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>800</width>
+    <height>16777215</height>
+   </size>
+  </property>
   <property name="font">
    <font>
-    <family>Arial Black</family>
+    <family>Consolas</family>
    </font>
   </property>
   <property name="windowTitle">
@@ -58,6 +70,13 @@
       <widget class="QLineEdit" name="lineEdit_uploader">
        <property name="placeholderText">
         <string>搜索上传者</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_download_list">
+       <property name="text">
+        <string>下载列表</string>
        </property>
       </widget>
      </item>

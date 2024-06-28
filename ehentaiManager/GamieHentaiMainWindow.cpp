@@ -2,10 +2,15 @@
 #include "GamieHentaiObject.h"
 #include "GamieHentaiMainIndexListItem.h"
 #include "GamieHentaiImageManager.h"
+#include "GamieHentaiList.h"
+#include "GamieHentaiDownloadInfoItem.h"
 #include "ui_GamieHentaiMainWindow.h"
 #include <QListWidget>
 #include <QListWidgetItem>
 #include <QDir>
+
+extern GamieHentaiList             *GetDownloadingList();
+
 GamieHentaiMainWindow::GamieHentaiMainWindow(QWidget *parent) :
     QWidget(parent),_ehentai_object(nullptr),_range(0),
     ui(new Ui::GamieHentaiMainWindow){
@@ -56,6 +61,8 @@ void GamieHentaiMainWindow::on_listWidget_main_index_list_itemPressed(QListWidge
         QString file_name;
         QDir dir;
 
+
+
         if(!dir.exists(save)){
             bool mkdir = false;
             mkdir = dir.mkdir(save);
@@ -91,6 +98,11 @@ void GamieHentaiMainWindow::on_listWidget_main_index_list_itemPressed(QListWidge
         download_list_item.href =url;
         download_list_item.state =GamieHentaiGlobalSettings::NO_START_DOWNLOADING;
         GamieHentaiGlobalSettings::global().addDownloadListItem(download_list_item);
+
+        GamieHentaiDownloadInfoItem *item = new GamieHentaiDownloadInfoItem;
+        item->setKey(save);
+        item->setImageName(it->getTitle());
+        GetDownloadingList()->addItemList( item);
 
 #if 0
         GamieHentaiImagePageIndexManager *im = new GamieHentaiImagePageIndexManager;
@@ -210,4 +222,10 @@ void GamieHentaiMainWindow::on_lineEdit_search_editingFinished()
 {
 
     _finished_mode = enuFinishedEditLine::SEARCH_IMAGE_NAME;
+}
+
+void GamieHentaiMainWindow::on_pushButton_download_list_clicked(){
+    extern GamieHentaiList             *GetDownloadingList();
+    GetDownloadingList()->show();
+    GetDownloadingList()->resize(800,600);
 }

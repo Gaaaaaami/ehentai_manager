@@ -1,6 +1,8 @@
 #include "GamieHentaiGlobalSettings.h"
 #include "GamieHentaiImageManager.h"
+#include "GamieHentaiList.h"
 #include <QNetworkProxy>
+extern GamieHentaiList             *GetDownloadingList();
 
 GamieHentaiGlobalSettings::GamieHentaiGlobalSettings():_max_download_number(7){
     _page_index_manager = nullptr;
@@ -164,6 +166,17 @@ bool GamieHentaiGlobalSettings::hasDownloadListItemDownloading(){
     return false;
 }
 
+GamieHentaiGlobalSettings::stDownloadListItem GamieHentaiGlobalSettings::getDownloadListItem(QString dir){
+
+    for(auto &item : _download_list_item){
+        if(item.save == dir)
+            return item;
+    }
+    GamieHentaiGlobalSettings::stDownloadListItem status;
+
+    return status;
+}
+
 void GamieHentaiGlobalSettings::update(){
     execDownloaderManager([&](QString dir){
         unsigned int success,failed,downloading;
@@ -177,9 +190,13 @@ void GamieHentaiGlobalSettings::update(){
     downloadNextNoDownloadStateListItem();
 
 
+#if 0
     for(auto &it : _download_list_item)
         if(it.state == GamieHentaiGlobalSettings::NO_START_DOWNLOADING)
             qDebug() << it.save << it.href << " -"<< "waiting";
+#endif
+    GetDownloadingList()->udtItemList();
+
 }
 
 
