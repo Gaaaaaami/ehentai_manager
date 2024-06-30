@@ -94,6 +94,13 @@
      </property>
     </widget>
    </item>
+   <item>
+    <widget class="QPushButton" name="pushButton_open_dir">
+     <property name="text">
+      <string>打开目录</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources/>

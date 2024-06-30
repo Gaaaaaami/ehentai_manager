@@ -20,6 +20,8 @@ public:
 private slots:
     void on_pushButton_redownload_clicked();
 
+    void on_pushButton_open_dir_clicked();
+
 private:
     Ui::GamieHentaiItemDownloadInfo *ui;
 private:

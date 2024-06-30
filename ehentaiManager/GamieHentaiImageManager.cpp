@@ -209,7 +209,7 @@ void GamieHentaiImageDownloaderManager::OnResponse(QByteArray &msg){
     }
 }
 void GamieHentaiImageDownloaderManager::OnRetry(int count){
-    //qDebug() << __FUNCTION__ << count;
+    qDebug() << __FUNCTION__ << count;
     if(_retry)
         return;
     _retry = true;

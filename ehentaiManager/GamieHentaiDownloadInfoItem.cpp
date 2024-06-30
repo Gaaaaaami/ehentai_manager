@@ -2,6 +2,8 @@
 #include "ui_GamieHentaiDownloadInfoItem.h"
 #include "GamieHentaiGlobalSettings.h"
 #include "math.h"
+#include <QDesktopServices>
+#include <QUrl>
 GamieHentaiDownloadInfoItem::GamieHentaiDownloadInfoItem(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::GamieHentaiItemDownloadInfo){
@@ -36,7 +38,6 @@ void GamieHentaiDownloadInfoItem::updateInfo(){
 
     }else if(GamieHentaiGlobalSettings::enuImageDownloadStatus::FAILED ==state.state){
         ui->label_state->setText("fad");
-
     }
 
     double  p = double(success+failed) /double(image_total);
@@ -47,3 +48,13 @@ void GamieHentaiDownloadInfoItem::updateInfo(){
         ui->label_download_real_prograss->setText(QString::number(success+failed) + "/" + QString::number(image_total));
 }
 void GamieHentaiDownloadInfoItem::on_pushButton_redownload_clicked(){}
+
+void GamieHentaiDownloadInfoItem::on_pushButton_open_dir_clicked()
+{
+
+    QString directory = _key; // 替换为你要打开的目录路径
+
+    QDesktopServices::openUrl(QUrl::fromLocalFile(directory));
+
+
+}

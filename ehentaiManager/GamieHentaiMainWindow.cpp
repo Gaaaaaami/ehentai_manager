@@ -103,8 +103,8 @@ void GamieHentaiMainWindow::on_listWidget_main_index_list_itemPressed(QListWidge
         item->setKey(save);
         item->setImageName(it->getTitle());
         GetDownloadingList()->addItemList( item);
-
 #if 0
+
         GamieHentaiImagePageIndexManager *im = new GamieHentaiImagePageIndexManager;
         im->setSaveTo(save);
         im->request(url);
@@ -227,5 +227,6 @@ void GamieHentaiMainWindow::on_lineEdit_search_editingFinished()
 void GamieHentaiMainWindow::on_pushButton_download_list_clicked(){
     extern GamieHentaiList             *GetDownloadingList();
     GetDownloadingList()->show();
+    GetDownloadingList()->setWindowTitle("ehentai donwload list");
     GetDownloadingList()->resize(800,600);
 }

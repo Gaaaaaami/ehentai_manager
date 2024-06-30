@@ -34,13 +34,10 @@ int main(int argc, char *argv[]){
     exec_timer.start(800);
     GamieHentaiGlobalSettings::global().setUseNetProxy(true);
     GamieHentaiGlobalSettings::global().setSocks5Proxy("10.255.169.18", 65533);
-
-
     GetDownloadingList();
     GetMainWindowInstance()->BindehentaiObject(GetObjectInstance());
     GetMainWindowInstance()->show();
     GetObjectInstance()->request(QString("https://e-hentai.org/"));
-
     return a.exec();
 }
 
