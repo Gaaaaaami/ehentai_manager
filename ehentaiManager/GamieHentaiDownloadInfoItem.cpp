@@ -32,10 +32,8 @@ void GamieHentaiDownloadInfoItem::updateInfo(){
         ui->label_state->setText("nsd");
     }else if(GamieHentaiGlobalSettings::enuImageDownloadStatus::DOWNLOADING==state.state){
         ui->label_state->setText("dod");
-
     }else if(GamieHentaiGlobalSettings::enuImageDownloadStatus::SUCCESS ==state.state){
         ui->label_state->setText("suc");
-
     }else if(GamieHentaiGlobalSettings::enuImageDownloadStatus::FAILED ==state.state){
         ui->label_state->setText("fad");
     }

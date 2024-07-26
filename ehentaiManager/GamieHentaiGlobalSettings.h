@@ -26,6 +26,16 @@ public:
         QString href;
     }stDownloadFileStatus;
     typedef struct{
+        unsigned int image_total;
+        unsigned int speed;
+        qint64 speed_start;
+    }stDownloadFileStatus_2;
+
+
+
+
+
+    typedef struct{
         QString href;
         QString save;
         enuImageDownloadStatus    state;
@@ -49,6 +59,7 @@ public:
     bool         checkImageDownloadIsDone(QString dir, unsigned int &success, unsigned int &failed, unsigned int &downloading);
     unsigned int getImageTotal(QString dir);
     QVector<GamieHentaiGlobalSettings::stDownloadFileStatus>    &getDownloadManager(QString dir);
+
 public:
     void addDownloadListItem(stDownloadListItem &item);
     void modDownloadListItemState(QString save , GamieHentaiGlobalSettings::enuImageDownloadStatus );
@@ -68,7 +79,7 @@ private:
     bool                                                                     _use_net_proxy;
 private:
     QMap<QString,QVector<GamieHentaiGlobalSettings::stDownloadFileStatus>>   _download_manager;
-    QMap<QString,unsigned int>                                               _image_total;
+    QMap<QString,stDownloadFileStatus_2>                                     _download_manager_2;
     QElapsedTimer                                                            _runtime;
 private:
     QVector<stDownloadListItem>                                              _download_list_item;

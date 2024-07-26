@@ -190,6 +190,9 @@ GamieHentaiImageDownloaderManager::GamieHentaiImageDownloaderManager(){}
 GamieHentaiImageDownloaderManager::~GamieHentaiImageDownloaderManager(){
     extern void OnDownloaderManagerRelease(GamieHentaiImageDownloaderManager *m);
     OnDownloaderManagerRelease(this);
+
+    connect(&_default_timer, SIGNAL(timeout()) ,this ,SLOT(defaultTimeout()));
+    _default_timer.start(16);
 }
 void GamieHentaiImageDownloaderManager::OnResponse(QByteArray &msg){
    // qDebug() <<getRequestUrl()<< "downloaded";
@@ -254,16 +257,22 @@ void GamieHentaiImageDownloaderManager::OnRequest(){
     p.title = getFixedImageName();
     p.status = GamieHentaiGlobalSettings::DOWNLOADING;
     GamieHentaiGlobalSettings::global().addDownloaderManager(_save_to, p);
+
+
+    _timeout_checkout_elapsed.invalidate();
+    _timeout_checkout_elapsed.start();
 }
 void GamieHentaiImageDownloaderManager::OnProgressChange(qint64 current, qint64 total){
     _current = current;
     _total = total;
     _progress = double(current) / double(total);
-    //qDebug() << getFixedImageName() << ", progress->"<<(_progress * 100.0) << "%";
+
+    _timeout_checkout_elapsed.restart();
+
     if(std::isnan(getProgress()) || _total == 0  ){
         if(_net_reply)
             if(_net_reply->isRunning()){
-
+               _timeout_checkout_elapsed.invalidate();
                _net_reply->close();
                _net_reply->deleteLater();
 
@@ -273,12 +282,14 @@ void GamieHentaiImageDownloaderManager::OnProgressChange(qint64 current, qint64 
     }
 }
 void GamieHentaiImageDownloaderManager::OnDownloadedSuccess(){
+    _timeout_checkout_elapsed.invalidate();
     GamieHentaiGlobalSettings::global().modDownloaderManager(_save_to,
                                                              _request_url,
                                                              GamieHentaiGlobalSettings::enuImageDownloadStatus::SUCCESS);
 }
 void GamieHentaiImageDownloaderManager::OnDownloadedFailed(){
-    qDebug() << __FUNCTION__ << _request_url << _image_href << _image_name;
+    _timeout_checkout_elapsed.invalidate();
+    //qDebug() << __FUNCTION__ << _request_url << _image_href << _image_name;
     GamieHentaiGlobalSettings::global().modDownloaderManager(_save_to,
                                                              _request_url,
                                                              GamieHentaiGlobalSettings::enuImageDownloadStatus::FAILED);
@@ -314,4 +325,14 @@ QString GamieHentaiImageDownloaderManager::getImageName(){
 }
 QString GamieHentaiImageDownloaderManager::getFixedImageName(){
     return _image_name;
+}
+
+void GamieHentaiImageDownloaderManager::defaultTimeout(){
+    if(_timeout_checkout_elapsed.isValid())
+        if(_timeout_checkout_elapsed.elapsed()>= 10000){
+        //大于10s
+        OnRetry(_retry_count);
+        _retry_count++;
+
+        }
 }

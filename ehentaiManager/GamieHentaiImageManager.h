@@ -117,6 +117,8 @@ public:
 signals:
     void signal_delete();
     void signal_reconnect(QString url);
+protected slots:
+    virtual void defaultTimeout();
 protected:
     QString                                                          _image_href;
     QString                                                          _image_name;
@@ -124,6 +126,9 @@ protected:
     GamieHentaiImageManager                                         *_manager;
 protected:
     bool                                                             _retry;
+protected:
+    QTimer                                                           _default_timer;
+    QElapsedTimer                                                    _timeout_checkout_elapsed;
 };
 
 #endif // GAMIEHENTAIIMAGEMANAGER_H

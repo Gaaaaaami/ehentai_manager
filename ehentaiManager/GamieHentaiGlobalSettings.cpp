@@ -48,7 +48,11 @@ void GamieHentaiGlobalSettings::addDownloaderManager(QString dir, GamieHentaiGlo
 }
 
 void GamieHentaiGlobalSettings::addImageTotal(QString dir, unsigned int total){
-    _image_total.insert(dir , total);
+    stDownloadFileStatus_2 d;
+    d.speed = 0;
+    d.speed_start = -1;
+    d.image_total = total;
+    _download_manager_2.insert(dir , d);
 }
 void GamieHentaiGlobalSettings::modDownloaderManager(QString dir, QString request_url, GamieHentaiGlobalSettings::enuImageDownloadStatus status){
     auto it = _download_manager.find(dir);
@@ -119,10 +123,10 @@ bool GamieHentaiGlobalSettings::checkImageDownloadIsDone(QString dir,unsigned in
 
 }
 unsigned int GamieHentaiGlobalSettings::getImageTotal(QString dir){
-    auto it = _image_total.find(dir);
-    if(it == _image_total.end())
+    auto it = _download_manager_2.find(dir);
+    if(it == _download_manager_2.end())
         return 0;
-    return it.value();
+    return it.value().image_total;
 }
 QVector<GamieHentaiGlobalSettings::stDownloadFileStatus> &GamieHentaiGlobalSettings::getDownloadManager(QString dir){
     auto it = _download_manager.find(dir);

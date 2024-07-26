@@ -46,7 +46,7 @@ void GamieHentaiObject::request(QString url){
     _net_reply = rep;
     connect(rep, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(OnError(QNetworkReply::NetworkError)));
     connect(rep, SIGNAL(downloadProgress(qint64 , qint64 )), this, SLOT(OnProgressChange(qint64 , qint64 )));
-    connect(rep, SIGNAL(finished()), this, SLOT(OnNewData()));
+   // connect(rep, SIGNAL(readyRead()), this, SLOT(OnNewData()));
 
 }
 void GamieHentaiObject::request(QString url, QString save_to){
@@ -66,7 +66,7 @@ void GamieHentaiObject::request(QString url, QString save_to){
     _net_reply = rep;
     connect(rep, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(OnError(QNetworkReply::NetworkError)));
     connect(rep, SIGNAL(downloadProgress(qint64 , qint64 )), this, SLOT(OnProgressChange(qint64 , qint64 )));
-    connect(rep, SIGNAL(finished()), this, SLOT(OnNewData()));
+    //connect(rep, SIGNAL(readyRead()), this, SLOT(OnNewData()));
 }
 
 void GamieHentaiObject::printHex(char *data, unsigned int le){
@@ -134,7 +134,8 @@ void GamieHentaiObject::OnProgressChange(qint64 current, qint64 total){
 
 void GamieHentaiObject::OnNewData(){
     auto data = _net_reply->readAll();
-    qDebug() << __FUNCTION__ <<data.length();
+    unsigned int n = data.length() / 1024;
+    qDebug() << __FUNCTION__<< n << "kb";
 }
 void GamieHentaiObject::Controller(){
 #ifndef USE_UI_SHOW
